@@ -1,0 +1,49 @@
+{
+    "name": "eugenefvdm/multi-tenancy-pwa",
+    "description": "A Laravel package for Filament multi-tenancy & PWA",
+    "type": "library",
+    "license": "MIT",    
+    "authors": [
+        {
+            "name": "Eugene van der Merwe",
+            "email": "hello@eugenefvdm.com"
+        }
+    ],
+    "require": {
+        "filament/filament": "4.x-dev",
+        "laravel/framework": "^12.0",
+        "spatie/laravel-ray": "^1.40"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^10.3",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-laravel": "^3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Eugenefvdm\\MultiTenancyPWA\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Eugenefvdm\\MultiTenancyPWA\\Tests\\": "tests/"            
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Eugenefvdm\\MultiTenancyPWA\\MultiTenancyPWAServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest --parallel"
+    }
+}
