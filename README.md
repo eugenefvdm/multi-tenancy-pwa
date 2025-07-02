@@ -2,6 +2,14 @@
 
 A set up opinionated helpers for Laravel to instantly boot a multi-tenant aware back office for Filament 4. It has PWA features for app installation and push notifications and includes Google Socialite login (compliments of Povilas: https://laraveldaily.com/post/filament-sign-in-with-google-using-laravel-socialite)
 
+## Packages included
+
+The following are presumed to be used and already included in composer:
+
+- Filament 4.x
+- Laravel Socialite
+- Spatie Eloquent Sortable
+
 ## Installation
 
 ```bash
@@ -12,7 +20,17 @@ composer config minimum-stability beta
 composer require eugenefvdm/multi-tenancy-pwa
 ```
 
+```bash
+php artisan vendor:publish --tag=eloquent-sortable-config
+```
+
 ## Setup
+
+### Spatie orderable column name
+
+In `config/eloquent-sortable.php`, change `order_column_name` from `order_colulmn` to `order`.
+
+If you're using this in your code you'll need both `Sortable` and `SortableTrait`.
 
 ### Database migrations
 
@@ -58,7 +76,7 @@ class Tenant extends Model
 
 ### Model Trait
 
-Add the following trait to your tenant aware models (but not `Tenant.php`):
+Add the following trait to your tenant aware models (but not to `Tenant.php`):
 
 ```php
 use Eugenefvdm\MultiTenancyPWA\Traits\HasTenantRelationship;
@@ -66,7 +84,58 @@ use Eugenefvdm\MultiTenancyPWA\Traits\HasTenantRelationship;
 
 ### Filament Panel Service Provider
 
+#### ApplyTenantScopes Middleware
+
+Let's say you have `todo` and `category` tables and you want them to automatically get `tenant_id`. Use this middleware:
+
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use App\Models\Category;
+use App\Models\Todo;
+use Closure;
+use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class ApplyTenantScopes
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  Closure(Request): (Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        Category::addGlobalScope(
+            fn (Builder $query) => $query->whereBelongsTo(Filament::getTenant()),
+        );
+        
+        Todo::addGlobalScope(
+            fn (Builder $query) => $query->whereBelongsTo(Filament::getTenant()),
+        );
+
+        return $next($request);
+    }
+}
+```
+
+Please note, the security of your application is your responsbility. Be sure to read this part of the manual:
+
+### Setup of Database notifications
+
+Laravel 11 and higher:
+
+```
+php artisan make:notifications-table
+```
+
 When you run `composer require`, it will install Filament.
+
+### To automatically assign your tenant `id` column to every record creation and list view, add Tenant
 
 Next, continue the Filament installation:
 
@@ -77,17 +146,22 @@ php artisan filament:install --panels
 Open `AdminPanelProvider.php` and add this to the end, below the `authMiddleware` section:
 
 ```php
+use App\Http\Middleware\ApplyTenantScopes;
 use App\Models\Tenant;
-use 
+use Eugenefvdm\MultiTenancyPWA\Filament\Pages\Tenancy\RegisterNewTenant;
 
 // 
 ->tenant(Tenant::class)
 ->registration()
 ->tenantRegistration(RegisterNewTenant::class)
+->tenantProfile(EditMyTenantProfile::class)
 ->renderHook( 
     'panels::auth.login.form.after',
     fn () => view('multi-tenancy-pwa::auth.socialite.google')
-);
+->tenantMiddleware([
+    ApplyTenantScopes::class,
+], isPersistent: true)
+->databaseNotifications();
 ```
 
 Next, update your user model:
@@ -139,7 +213,9 @@ php artisan vendor:publish --tag="multi-tenancy-pwa-migrations"
 
 First see: https://herd.laravel.com/docs/macos/advanced-usage/social-auth
 
-Then go to : https://console.cloud.google.com/apis/credentials?pli=1
+Then go to: https://console.cloud.google.com/apis/credentials?pli=1
+
+At Google's URL above, carefully copy out your `CLIENT_ID` and `CLIENT_SECRET` top right.
 
 ```bash
 GOOGLE_CLIENT_ID=******
@@ -167,4 +243,22 @@ https://app.test/admin/register
 - App installation button
 - Push notifications
 
+## More information
 
+### Excluding resources from tenancy
+
+As per the manual, you can exclude Filament resources from Tenancy by doing this:
+
+```php
+use Filament\Resources\Resource;
+
+protected static bool $isScopedToTenant = false;
+```
+
+## Socialite Errors
+
+### Incorrect Client Secret
+
+Client error: `POST https://www.googleapis.com/oauth2/v4/token` resulted in a `400 Bad Request` response: { "error": "invalid_request", "error_description": "Missing required parameter: code" }
+
+The `Client secret` is incorrect. It's the bottom value on Google's site.

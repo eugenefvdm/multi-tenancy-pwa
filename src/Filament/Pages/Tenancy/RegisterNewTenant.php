@@ -11,7 +11,7 @@ class RegisterNewTenant extends RegisterTenant
 {
     public static function getLabel(): string
     {
-        return 'Register';
+        return 'Add new group';
     }
 
     public function form(Schema $schema): Schema
@@ -19,7 +19,7 @@ class RegisterNewTenant extends RegisterTenant
         return $schema
             ->schema([
                 TextInput::make('name')
-                    ->helperText('The name of your business.')
+                    ->helperText('How would you like to group your todos?')
                     ->columnSpanFull(),
             ]);
     }

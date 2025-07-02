@@ -13,7 +13,8 @@
         "filament/filament": "4.x-dev",
         "laravel/framework": "^12.0",
         "spatie/laravel-ray": "^1.40",
-        "laravel/socialite": "^5.21"
+        "laravel/socialite": "^5.21",
+        "spatie/eloquent-sortable": "^4.5"        
     },
     "require-dev": {
         "orchestra/testbench": "^10.3",
