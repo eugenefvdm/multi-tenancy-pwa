@@ -56,9 +56,9 @@ class EditProfile extends BaseEditProfile
                         ->view('multi-tenancy-pwa::pwa.install-button'),
 
                     Actions::make([
-                        Action::make('PWA Raw Diagnostics')
-                            ->label('PWA Raw Diagnostics')
-                            ->url('/pwa/diagnostics'),
+                        Action::make('PWA Diagnostics')
+                            ->label('PWA Diagnostics')
+                            ->url('/app'),
                     ]),
 
                     Fieldset::make('Notifications')->schema([

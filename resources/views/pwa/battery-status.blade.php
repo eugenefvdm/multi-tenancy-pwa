@@ -6,6 +6,7 @@
 
 <script>
     function batteryLevel() {
+        console.log('batteryLevel');
         return {
             batteryLevel: 'N/A',
             async getBatteryLevel() {

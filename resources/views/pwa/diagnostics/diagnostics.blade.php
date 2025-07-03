@@ -6,15 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>PWA Raw Diagnostics</title>
+    <title>PWA Diagnostics</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    @livewireStyles
+    {{-- If styles are not working, rather use the cdn but beware not for production - see warning in inspect }}
+    {{-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> --}}
+
+    {{-- Throught trail and error I find @livewireStyles are not needed on this page but scripts are - probably because of Alpine.js }}
+    {{-- @livewireStyles --}}
 
     @include('multi-tenancy-pwa::pwa.landing-page-styles')
 
-    {{-- @include('pwa.manifest') --}}
+    <link rel="manifest" href="/manifest.json">
 </head>
 
 <body>
@@ -24,9 +28,10 @@
             <div>
                 <br>
                 <div class="text-3xl tracking-tight text-gray-900 sm:text-5xl">
-                    <br>PWA Raw Diagnostics
+                    <br>PWA Diagnostics
                 </div>
 
+                {{-- Auth will only work if the route is wrapped by web middleware --}}
                 <div class="flex justify-center mt-2">
                     {{ Auth::user() ? 'Auth::user() is `' . Auth::user()->name . '`' : 'Auth::user() is null' }}
                 </div>
