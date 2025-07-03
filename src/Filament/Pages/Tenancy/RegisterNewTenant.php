@@ -11,7 +11,7 @@ class RegisterNewTenant extends RegisterTenant
 {
     public static function getLabel(): string
     {
-        return 'Add new group';
+        return 'Add a new project';
     }
 
     public function form(Schema $schema): Schema
@@ -19,7 +19,7 @@ class RegisterNewTenant extends RegisterTenant
         return $schema
             ->schema([
                 TextInput::make('name')
-                    ->helperText('How would you like to group your todos?')
+                    ->helperText('How would you like to name this project?')
                     ->columnSpanFull(),
             ]);
     }

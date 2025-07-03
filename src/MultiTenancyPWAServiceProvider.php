@@ -17,11 +17,12 @@ class MultiTenancyPWAServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'multi-tenancy-pwa');
         // $this->publishesMigrations([
         //     __DIR__.'/../database/migrations' => database_path('migrations'),
         // ]);
 
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'multi-tenancy-pwa');
+        
         $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
     }
 } 

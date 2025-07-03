@@ -124,6 +124,7 @@ class ApplyTenantScopes
 ```
 
 Please note, the security of your application is your responsbility. Be sure to read this part of the manual:
+https://filamentphp.com/docs/4.x/users/tenancy#tenancy-security
 
 ### Setup of Database notifications
 
@@ -151,6 +152,7 @@ use App\Models\Tenant;
 use Eugenefvdm\MultiTenancyPWA\Filament\Pages\Tenancy\RegisterNewTenant;
 
 // 
+->profile(\App\Filament\Pages\Auth\EditProfile::class);
 ->tenant(Tenant::class)
 ->registration()
 ->tenantRegistration(RegisterNewTenant::class)
@@ -161,19 +163,23 @@ use Eugenefvdm\MultiTenancyPWA\Filament\Pages\Tenancy\RegisterNewTenant;
 ->tenantMiddleware([
     ApplyTenantScopes::class,
 ], isPersistent: true)
-->databaseNotifications();
+->databaseNotifications()
+->colors([
+    'primary' => Color::Cyan
+]);
 ```
 
 Next, update your user model:
 
 ```php
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasDefaultTenant;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable implements FilamentUser, HasTenants
+class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
     // ...
     protected $fillable = [
@@ -199,6 +205,16 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     public function canAccessTenant(Model $tenant): bool
     {
         return $this->tenants()->whereKey($tenant)->exists();
+    }
+
+    public function getDefaultTenant(): ?Model
+    {
+        return $this->latestTenant()->first();
+    }
+
+    public function latestTenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'latest_tenant_id');
     }
 }
 ```
@@ -262,3 +278,9 @@ protected static bool $isScopedToTenant = false;
 Client error: `POST https://www.googleapis.com/oauth2/v4/token` resulted in a `400 Bad Request` response: { "error": "invalid_request", "error_description": "Missing required parameter: code" }
 
 The `Client secret` is incorrect. It's the bottom value on Google's site.
+
+## PWA Images
+
+If you have an SVG, you can resize it here:
+See: https://pwagenerator.test/
+

@@ -12,7 +12,8 @@ return new class extends Migration
     public function up()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('google_id')->nullable();
+            $table->foreignId('latest_tenant_id')->nullable()->constrained('tenants')->after('id');
+            $table->string('google_id')->nullable()->after('latest_tenant_id');
         });
     }
 };

@@ -10,7 +10,7 @@ class EditMyTenantProfile extends EditTenantProfile
 {
     public static function getLabel(): string
     {
-        return 'Group profile';
+        return 'Project profile';
     }
 
     public function form(Schema $schema): Schema
