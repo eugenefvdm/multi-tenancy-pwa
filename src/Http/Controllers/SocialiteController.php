@@ -44,7 +44,7 @@ class SocialiteController extends Controller
         if ($user->tenants()->count() > 0) {            
             $tenant = $user->tenants()->first();
 
-            return redirect()->intended(route('filament.admin.pages.dashboard', $tenant));
+            return redirect()->intended(route('filament.admin.tenant', $tenant));
         }
 
         return redirect()->intended(route('filament.admin.tenant.registration'));
