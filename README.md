@@ -284,3 +284,7 @@ The `Client secret` is incorrect. It's the bottom value on Google's site.
 If you have an SVG, you can resize it here:
 See: https://pwagenerator.test/
 
+## Application Icon Name on Android
+
+`short_name` in manifest.json
+
