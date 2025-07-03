@@ -57,6 +57,7 @@ self.addEventListener('push', function (event) {
 // Cache on the 'install' event listener
 // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/install_event#examples
 self.addEventListener("install", event => {
+    console.log('Adding an event listener for `install`');
     this.skipWaiting();
     event.waitUntil(
         caches.open(staticCacheName)
@@ -69,6 +70,7 @@ self.addEventListener("install", event => {
 // Clear the cache on the 'activate' event listener
 // https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerGlobalScope/activate_event#examples
 self.addEventListener('activate', event => {
+    console.log('Adding an event listener for `activate`');
     event.waitUntil(
         caches.keys().then(cacheNames => {
             return Promise.all(
@@ -83,6 +85,7 @@ self.addEventListener('activate', event => {
 
 // Fetch - Serve from the cache - default method as per original package
  self.addEventListener("fetch", event => {
+    console.log('Adding an event listener for `fetch`');
     event.respondWith(
         caches.match(event.request)
             .then(response => {
@@ -105,6 +108,8 @@ addEventListener("message", (event) => {
 
 // Add an event handler for clicks in the notification to go to a URL
 self.addEventListener('notificationclick', function(event) {
+    console.log('Adding an event listener for `notificationclick` that goes to a URL');
+    
     event.notification.close(); // Close the notification
 
     // Get the URL from the notification data
