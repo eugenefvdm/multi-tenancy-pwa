@@ -1,22 +1,40 @@
 # Multi-tenancy PWA
 
-A set up opinionated helpers for Laravel to instantly boot a multi-tenant aware back office for Filament 4. It has PWA features for app installation and push notifications and includes Google Socialite login (compliments of Povilas: https://laraveldaily.com/post/filament-sign-in-with-google-using-laravel-socialite)
+A very opinionated setup script for Laravel and Filament PHP to quickly bootstrap a modern multi-tenant aware back office application.
 
-## Packages included
+It has PWA features for app installation and web push notifications.
+
+It includes Google Socialite login (compliments of Povilas: https://laraveldaily.com/post/filament-sign-in-with-google-using-laravel-socialite)
+
+## General Features
+
+- Works with Filament 4 for rapid application development
+- Includes a `HasTenantRelationship` trait that may be used to make models tenant aware
+- There is ocial login using Google making signing up of new users a breeze
+
+## PWA (Progressive App Features)
+
+- An App installation button
+- Web Push notifications
+- PWA Diagnostics Screen
+
+## Prerequisites
+
+- FilamentPHP version 4.x must be installed
+
+## Packages used
 
 The following are presumed to be used and already included in composer:
 
-- Filament 4.x
 - Laravel Socialite
 - Spatie Eloquent Sortable
+- Web push from Laravel Notification Channels
 
 ## Installation
 
+### If Filament 4.x is still in beta:
 ```bash
 composer config minimum-stability beta
-```
-
-```bash
 composer require filamentphp/filament:4.x
 ```
 
@@ -24,6 +42,7 @@ composer require filamentphp/filament:4.x
 composer require eugenefvdm/multi-tenancy-pwa
 ```
 
+### If you're going to be sorting Filament resources any time soon
 ```bash
 php artisan vendor:publish --tag=eloquent-sortable-config
 ```
@@ -32,7 +51,7 @@ php artisan vendor:publish --tag=eloquent-sortable-config
 
 ### Spatie orderable column name
 
-In `config/eloquent-sortable.php`, change `order_column_name` from `order_colulmn` to `order`.
+In `config/eloquent-sortable.php`, change `order_column_name` from `order_colulmn` to `sort`.
 
 If you're using this in your code you'll need both `Sortable` and `SortableTrait`.
 
@@ -177,6 +196,79 @@ php artisan vendor:publish --provider="NotificationChannels\WebPush\WebPushServi
 php artisan vendor:publish --provider="NotificationChannels\WebPush\WebPushServiceProvider" --tag="migrations"
 ```
 
+Example notification:
+```php
+<?php
+
+namespace App\Notifications;
+
+use Filament\Facades\Filament;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use NotificationChannels\WebPush\WebPushChannel;
+use NotificationChannels\WebPush\WebPushMessage;
+
+class WebpushNotification extends Notification
+{
+    use Queueable;
+
+    /**
+     * Create a new notification instance.
+     */
+    public function __construct(private string $title = 'Default Title', private string $body = 'Default Body Text')
+    {
+        //
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @return array<int, string>
+     */
+    public function via(object $notifiable): array
+    {
+        return [WebPushChannel::class];
+    }
+
+    public function toWebPush($notifiable, $notification): WebPushMessage
+    {
+        $tenantId = Filament::getTenant()->id ?? 1;
+
+        return (new WebPushMessage)
+            ->title($this->title)            
+            ->body($this->body)
+            ->action('Call to action', 'do_something') // This appears as a button on the notification
+            ->options(['TTL' => 10000])
+            ->vibrate([300, 100, 400])
+            ->data(['url' => config('app.url') . '/admin/' . $tenantId . '/notifications']);
+        // ->icon('/approved-icon.png')
+        // ->data(['id' => $notification->id])
+        // ->badge()
+        // ->dir()
+        // ->image()
+        // ->lang()
+        // ->renotify()
+        // ->requireInteraction()
+        // ->tag()
+
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @return array<string, mixed>
+     */
+    public function toArray(object $notifiable): array
+    {
+        return [
+            //
+        ];
+    }
+}
+```
+
 ### Database notifications
 
 Laravel 11 and higher:
@@ -273,18 +365,7 @@ Sign up for a new account:
 
 https://app.test/admin/register
 
-## General Features
-
-- Work with Filament 4
-- Includes `HasTenantRelationship` that may be used to make any model tenant aware
-- Social login using Google
-
-## PWA Features
-
-- App installation button
-- Push notifications
-
-## More information
+## Tenancy tips
 
 ### Excluding resources from tenancy
 
