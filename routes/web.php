@@ -1,8 +1,11 @@
 <?php
 
 use Eugenefvdm\MultiTenancyPWA\Http\Controllers\SocialiteController;
+use Eugenefvdm\MultiTenancyPWA\Http\Controllers\WebPushController;
+use Eugenefvdm\MultiTenancyPWA\Http\Controllers\WebPushSubscriptionController;
 use Illuminate\Support\Facades\Route;
 
+// Goolge(+) Social Login
 Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
     ->name('socialite.redirect');
 Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])
@@ -59,9 +62,8 @@ Route::get('/manifest.json', function () {
         ->header('Content-Type', 'application/manifest+json');
 })->name('pwa.manifest');
 
-// PWA routes
+// PWA routes - requires web middleware
 Route::get('/app', function () {
-
     return view('multi-tenancy-pwa::pwa.diagnostics', [
         'vapidPublicKey' => config('webpush.vapid.public_key')
     ]);
@@ -71,3 +73,9 @@ Route::get('/app', function () {
 Route::get('/offline', function () {
     return view('multi-tenancy-pwa::pwa.offline');
 })->name('pwa.offline');
+
+// Web Push Routes - requires web middleware
+Route::middleware('web')->group(function () {
+    Route::match(['post', 'put', 'delete'], '/push-subscription', [WebPushSubscriptionController::class, 'handle']);
+    Route::post('/send-notification', [WebPushController::class, 'sendNotification']);
+});

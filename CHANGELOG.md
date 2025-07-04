@@ -1,5 +1,9 @@
 # Change Log
 
+## 04 Jul 25
+
+- Add push notification biolerplate
+
 ## 03 Jul 25
 
 ### Added

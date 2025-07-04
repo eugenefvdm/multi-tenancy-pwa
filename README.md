@@ -17,6 +17,10 @@ composer config minimum-stability beta
 ```
 
 ```bash
+composer require filamentphp/filament:4.x
+```
+
+```bash
 composer require eugenefvdm/multi-tenancy-pwa
 ```
 
@@ -32,7 +36,7 @@ In `config/eloquent-sortable.php`, change `order_column_name` from `order_colulm
 
 If you're using this in your code you'll need both `Sortable` and `SortableTrait`.
 
-### Database migrations
+### Database migrations for Tenancy
 
 Every tenant aware table in your application should have this line:
 
@@ -123,18 +127,8 @@ class ApplyTenantScopes
 }
 ```
 
-Please note, the security of your application is your responsbility. Be sure to read this part of the manual:
+The security of your application is your responsbility. Be sure to read this part of the manual:
 https://filamentphp.com/docs/4.x/users/tenancy#tenancy-security
-
-### Setup of Database notifications
-
-Laravel 11 and higher:
-
-```
-php artisan make:notifications-table
-```
-
-When you run `composer require`, it will install Filament.
 
 ### To automatically assign your tenant `id` column to every record creation and list view, add Tenant
 
@@ -151,7 +145,10 @@ use App\Http\Middleware\ApplyTenantScopes;
 use App\Models\Tenant;
 use Eugenefvdm\MultiTenancyPWA\Filament\Pages\Tenancy\RegisterNewTenant;
 
-// 
+// Filament AdminPanelProvider extra sections
+->colors([ // Already exists
+    'primary' => Color::Cyan
+]);
 ->profile(\App\Filament\Pages\Auth\EditProfile::class);
 ->tenant(Tenant::class)
 ->registration()
@@ -163,13 +160,32 @@ use Eugenefvdm\MultiTenancyPWA\Filament\Pages\Tenancy\RegisterNewTenant;
 ->tenantMiddleware([
     ApplyTenantScopes::class,
 ], isPersistent: true)
-->databaseNotifications()
-->colors([
-    'primary' => Color::Cyan
-]);
+->databaseNotifications();
 ```
 
-Next, update your user model:
+## Web Push Notifications
+
+Composer will already be updated with `laravel-notification-channels/webpush`.
+
+Add the config file:
+
+```bash
+php artisan vendor:publish --provider="NotificationChannels\WebPush\WebPushServiceProvider" --tag="config"
+```
+
+```bash
+php artisan vendor:publish --provider="NotificationChannels\WebPush\WebPushServiceProvider" --tag="migrations"
+```
+
+### Database notifications
+
+Laravel 11 and higher:
+
+```
+php artisan make:notifications-table
+```
+
+## User Model
 
 ```php
 use Filament\Models\Contracts\FilamentUser;
@@ -181,6 +197,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Authenticatable implements FilamentUser, HasDefaultTenant, HasTenants
 {
+    use HasPushSubscriptions;
+
     // ...
     protected $fillable = [
         'google_id'        
@@ -240,6 +258,13 @@ GOOGLE_CLIENT_SECRET=******
 # GOOGLE_REDIRECT=https://fwd.host/http://your-herd-site.test/auth/google/callback
 ```
 
+## For web push
+
+```bash
+VAPID_PUBLIC_KEY=
+VAPID_PRIVATE_KEY=
+```
+
 See: https://laravel-news.com/fwd-host
 
 ## Logging in
@@ -271,6 +296,36 @@ use Filament\Resources\Resource;
 protected static bool $isScopedToTenant = false;
 ```
 
+## Web push errors
+
+```bash
+openssl_pkey_new(): Private key length must be at least 384 bits, configured to 0
+```
+
+You can simulate this error on the command line on a Mac
+
+```bash
+php -r 'print_r(openssl_pkey_new());'
+Warning: openssl_pkey_new(): Private key length must be at least 384 bits, configured to 0 in Command line code on line 1
+```
+
+```bash
+php -i | grep 'Openssl default config'
+Openssl default config => /etc/ssl/openssl.cnf
+sudo vi /etc/ssl/openssl.cnf
+sudo vi /opt/homebrew/opt/openssl@3/etc/openssl.cnf
+[ req ]
+default_bits            = 2048
+default_md              = sha256
+default_keyfile         = privkey.pem
+```
+
+But this works:
+```
+OPENSSL_CONF=/opt/homebrew/opt/openssl@3/etc/openssl.cnf \
+php -r 'var_dump(openssl_pkey_new(["private_key_type"=>OPENSSL_KEYTYPE_RSA]));'
+```
+
 ## Socialite Errors
 
 ### Incorrect Client Secret
@@ -287,4 +342,6 @@ See: https://pwagenerator.test/
 ## Application Icon Name on Android
 
 `short_name` in manifest.json
+
+
 

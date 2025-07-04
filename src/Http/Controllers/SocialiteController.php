@@ -4,7 +4,6 @@ namespace Eugenefvdm\MultiTenancyPWA\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Routing\Controller;
 
