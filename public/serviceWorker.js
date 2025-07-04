@@ -41,7 +41,7 @@ self.addEventListener('push', function (event) {
         const title = payload.title || 'Default Title';
         const options = {
             body: payload.body || 'Default Body',
-            icon: payload.icon || '/default-icon.png',
+            icon: payload.icon || '/notification-icon.png',
             data: payload.data || {}, // Any additional data to pass
             actions: payload.actions || [], // For notification buttons
         };

@@ -11,9 +11,9 @@ use Minishlink\WebPush\WebPush;
 class WebPushController extends Controller
 {
     /**
-     * Send a WebPushnotification to a specific subscription
+     * Send a web push notification to a specific subscription
      * 
-     * The notificaiton icon requires `default-icon.png` in the public folder
+     * The notification icon requires `notification-icon.png` in the public folder
      * 
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse

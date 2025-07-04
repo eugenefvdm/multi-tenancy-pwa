@@ -11,13 +11,13 @@ Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect']
 Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])
     ->name('socialite.callback');
 
-// Dynamic PWA Manifest
+// Dynamic PWA Manifest - copy/paste to your own Web route
 Route::get('/manifest.json', function () {
     $manifest = [
-        'name' => 'Todo Magic',
-        'short_name' => 'Todo Magic',
-        'description' => 'An app to magically manage your todos.',
-        'start_url' => config('app.url') . '/admin',
+        'name' => 'Your App Name',
+        'short_name' => 'Your App Short Name',
+        'description' => 'A description of your app',
+        'start_url' => config('app.url') . '/admin', // Fixed to Filament start page
         'display' => 'standalone',
         'theme_color' => '#000000',
         'background_color' => '#ffffff',
@@ -35,7 +35,7 @@ Route::get('/manifest.json', function () {
                 'form_factor' => 'narrow'
             ],
             [
-                'src' => '/img/pwa/screenshots/magic-wand-1280x720.jpeg',
+                'src' => '/img/pwa/screenshots/screenshot-1280x720.jpeg',
                 'sizes' => '1280x720',
                 'type' => 'image/jpeg',
                 'label' => 'Student Dashboard',
@@ -44,13 +44,13 @@ Route::get('/manifest.json', function () {
         ],
         'icons' => [
             [
-                'src' => '/img/pwa/icons/magic-wand-192x192.jpeg',
+                'src' => '/img/pwa/icons/icon-192x192.jpeg',
                 'type' => 'image/png',
                 'sizes' => '192x192',
                 'purpose' => 'any'
             ],
             [
-                'src' => '/img/pwa/icons/magic-wand-512x512.jpeg',
+                'src' => '/img/pwa/icons/icon-512x512.jpeg',
                 'type' => 'image/png',
                 'sizes' => '512x512',
                 'purpose' => 'any'
