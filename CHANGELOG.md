@@ -4,6 +4,8 @@
 
 ### Added
 
+- Regenerate session after login and remember password there too
+- Setting model and migrations
 - Wrap the Google Socialite callback route in the `web` middleware
 - Update README.md with information about the `web` middleware requirement
 
