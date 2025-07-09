@@ -37,7 +37,7 @@ class SocialiteController extends Controller
             ]);
         }
 
-        auth()->login($user);
+        auth()->login($user, true); // true = Also remember login
 
         // If the authenticated user is a tenant, redirect to the first tenant's dashboard
         if ($user->tenants()->count() > 0) {            

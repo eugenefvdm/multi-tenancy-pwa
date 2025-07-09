@@ -337,7 +337,8 @@ php artisan vendor:publish --tag="multi-tenancy-pwa-migrations"
 
 ### Add Google oAuth credentials
 
-First see: https://herd.laravel.com/docs/macos/advanced-usage/social-auth
+First see: https://fwd.host/ 
+Redirects to: https://herd.laravel.com/docs/macos/advanced-usage/social-auth
 
 Then go to: https://console.cloud.google.com/apis/credentials?pli=1
 
@@ -349,6 +350,8 @@ GOOGLE_CLIENT_SECRET=******
 # For testing use the line below, for production, leave it out.
 # GOOGLE_REDIRECT=https://fwd.host/http://your-herd-site.test/auth/google/callback
 ```
+
+Note: The callback route from Google needs to be wrapped in `web` for `auth()->login` to work.
 
 ## For web push
 

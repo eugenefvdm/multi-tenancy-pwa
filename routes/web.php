@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Route;
 
 // Goolge(+) Social Login
 Route::get('/auth/{provider}/redirect', [SocialiteController::class, 'redirect'])
-    ->name('socialite.redirect');
+    ->name('socialite.redirect');    
 Route::get('/auth/{provider}/callback', [SocialiteController::class, 'callback'])
-    ->name('socialite.callback');
+    ->name('socialite.callback')
+    ->middleware('web');
 
 // Dynamic PWA Manifest - copy/paste to your own Web route
 Route::get('/manifest.json', function () {
